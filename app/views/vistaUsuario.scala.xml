@@ -1,0 +1,10 @@
+@(u:UsuarioModel)
+
+<usuario>
+	<nombre>
+		@u.nombre
+	</nombre>
+	<nombre>
+		@u.edad
+	</nombre>
+</usuario>
