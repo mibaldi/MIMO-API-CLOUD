@@ -41,6 +41,7 @@ public class TareasController extends Controller {
 			return badRequest(form.errorsAsJson());
 		}
     	UsuarioModel uu=form.get();
+    	System.out.println(uu.nombre);
     	UsuarioModel.create(uu);		
         return redirect(routes.TareasController.listaUsuarios());
     }
