@@ -1,0 +1,23 @@
+{
+  "nombre": "Mikel",
+  "edad": 24,
+  "pass": {
+    "contrasenia": "12345678"
+  },
+  "emails": [
+    {
+      "email": "e1"
+    },
+    {
+      "email": "e2"
+    }
+  ],
+  "tareasUsuario": [
+    {
+      "texto": "aaaa"
+    },
+    {
+      "texto": "bbbb"
+    }
+  ]
+}

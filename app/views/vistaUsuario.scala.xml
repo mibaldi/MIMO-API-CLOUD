@@ -1,10 +1,21 @@
 @(u:UsuarioModel)
-
 <usuario>
+	<id>
+		@u.id
+	</id>
 	<nombre>
 		@u.nombre
 	</nombre>
-	<nombre>
+	<edad>
 		@u.edad
-	</nombre>
+	</edad>
+	<password>
+		@u.pass.getContrasenia
+	</password>
+	<tareas>
+		@for(t <- u.tareasUsuario){<tarea>@t.texto</tarea>}
+	</tareas>
+	<emails>
+		@for(e <- u.emails){<email>@e.email</email>}
+	</emails>
 </usuario>

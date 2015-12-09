@@ -9,6 +9,7 @@ scalaVersion := "2.11.6"
 libraryDependencies ++= Seq(
   javaJdbc,
   cache,
+  "mysql" % "mysql-connector-java" % "5.1.36",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
   javaWs
 )

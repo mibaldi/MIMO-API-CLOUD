@@ -3,23 +3,53 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index()
+GET      /                                                    controllers.Application.index()
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+GET      /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
 # Get usuario
-GET      /user/:usuario   controllers.TareasController.getUser(usuario)
+GET      /user/:usuario                                       controllers.UsuarioController.getUser(usuario)
 
 # Lista Usuarios
-GET      /listaUsuarios   controllers.TareasController.listaUsuarios()
+GET      /listaUsuarios                                       controllers.UsuarioController.listaUsuarios()
 
 # Crear usuario
-POST     /createUser      controllers.TareasController.createUser()
+POST     /createUser                                          controllers.UsuarioController.createUser()
 
 # Modificar usuario
-PUT      /user/:usuario   controllers.TareasController.update(usuario)
+PUT      /user/:usuario                                       controllers.UsuarioController.update(usuario)
 
 # Borrar usuario
+#POST /user/:usuario controllers.UsuarioController.delete(usuario,format: String ?= "plain")
+DELETE   /user/:usuario                                       controllers.UsuarioController.delete(usuario)
 
-DELETE /user/:usuario controllers.TareasController.delete(usuario)
+# Get Tarea Usuario
+GET      /tarea/:texto                                        controllers.TareaController.getTarea(texto)
+
+# Lista tareas usuario
+GET      /listaTareas/:usuario                                controllers.TareaController.listaTareasUsuario(usuario)
+
+# Lista tareas tag
+GET      /listaTareasTag/:tag                                controllers.TareaController.listaTareasTag(tag)
+
+# Lista tareas
+GET      /listaTareas                                         controllers.TareaController.listaTareas()
+
+# Crear tarea
+POST     /user/$usuario<[a-zA-Z0-9]*>/createTarea             controllers.TareaController.createTarea(usuario)
+
+# Modificar tarea
+PUT      /tarea/:texto                                        controllers.TareaController.updateTarea(texto)
+
+# Añadir usuario a tarea
+PUT      /tareaUsuario/$texto<[a-zA-Z0-9]*>/$usuario<[a-zA-Z0-9]*>   controllers.TareaController.anadirUsuario(texto,usuario)
+
+# Añadir tag a tarea
+PUT      /tareaTags/$texto<[a-zA-Z0-9]*>/$tag<[a-zA-Z0-9]*>   controllers.TareaController.anadirTag(texto,tag)
+
+# Añadir usuarios a tarea
+#PUT      /tarea/$texto<[a-zA-Z0-9]*>   					  controllers.TareaController.anadirUsuarios(texto)
+
+# Borrar tarea
+POST     /tarea/:texto                                        controllers.TareaController.deleteTarea(texto)
