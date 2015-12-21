@@ -1,3 +1,6 @@
-@(listaU:List[UsuarioModel])
+@(listaU:List[UsuarioModel], count: Integer)
 <?xml version="1.0" encoding="UTF-8"?>
-<usuarios>@for(u <- listaU){@vistaUsuario(u)}</usuarios>
+
+<usuarios>
+<count>@count</count>
+@for(u <- listaU){@vistaUsuario(u)}</usuarios>

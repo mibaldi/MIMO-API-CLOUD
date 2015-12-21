@@ -24,7 +24,10 @@ create table tags_model (
 
 create table tarea_model (
   id                            bigint auto_increment not null,
-  texto                         varchar(255),
+  titulo                        varchar(255),
+  descripcion                   varchar(255),
+  fechacreacion                 datetime(6),
+  fechafin                      datetime(6),
   constraint pk_tarea_model primary key (id)
 );
 
@@ -36,9 +39,12 @@ create table tarea_model_tags_model (
 
 create table usuario_model (
   id                            bigint auto_increment not null,
+  username                      varchar(255),
   nombre                        varchar(255),
   edad                          integer,
+  telefono                      varchar(255),
   pass_id                       bigint,
+  token                         varchar(255),
   constraint uq_usuario_model_pass_id unique (pass_id),
   constraint pk_usuario_model primary key (id)
 );

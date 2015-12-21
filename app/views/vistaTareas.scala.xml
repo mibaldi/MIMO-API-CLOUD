@@ -1,3 +1,5 @@
-@(listaT:List[TareaModel])
+@(listaT:List[TareaModel], count: Integer)
 <?xml version="1.0" encoding="UTF-8"?>
-<tareas>@for(t <- listaT){@vistaTarea(t)}</tareas>
+<tareas>
+<numeroTareasUsuario>@count</numeroTareasUsuario>
+@for(t <- listaT){@vistaTarea(t)}</tareas>

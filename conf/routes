@@ -8,39 +8,45 @@ GET      /                                                    controllers.Applic
 # Map static resources from the /public folder to the /assets URL path
 GET      /assets/*file                                        controllers.Assets.versioned(path="/public", file: Asset)
 
+# login
+POST /login                                                   controllers.UsuarioController.login()
+
+# logout
+GET /logout                                                   controllers.UsuarioController.logout()
+
 # Get usuario
-GET      /user/:usuario                                       controllers.UsuarioController.getUser(usuario)
+GET      /user                                       controllers.UsuarioController.getUser()
 
 # Lista Usuarios
-GET      /listaUsuarios                                       controllers.UsuarioController.listaUsuarios()
+GET      /users/$pag<[0-9]*>                                       controllers.UsuarioController.listaUsuarios(pag: Integer)
 
 # Crear usuario
-POST     /createUser                                          controllers.UsuarioController.createUser()
+POST     /user                                          controllers.UsuarioController.createUser()
 
 # Modificar usuario
-PUT      /user/:usuario                                       controllers.UsuarioController.update(usuario)
+PUT      /user                                      controllers.UsuarioController.update()
 
 # Borrar usuario
 #POST /user/:usuario controllers.UsuarioController.delete(usuario,format: String ?= "plain")
-DELETE   /user/:usuario                                       controllers.UsuarioController.delete(usuario)
+DELETE   /user                                       controllers.UsuarioController.delete()
 
 # Get Tarea Usuario
-GET      /tarea/:texto                                        controllers.TareaController.getTarea(texto)
+GET      /tareas/:texto                                        controllers.TareaController.getTarea(texto)
 
 # Lista tareas usuario
-GET      /listaTareas/:usuario                                controllers.TareaController.listaTareasUsuario(usuario)
+GET      /tareas                               controllers.TareaController.listaTareasUsuario()
 
 # Lista tareas tag
-GET      /listaTareasTag/:tag                                controllers.TareaController.listaTareasTag(tag)
+GET      /tareasTag                               controllers.TareaController.listaTareasTag()
 
 # Lista tareas
-GET      /listaTareas                                         controllers.TareaController.listaTareas()
+#GET      /listaTareas                                         controllers.TareaController.listaTareas()
 
 # Crear tarea
-POST     /user/$usuario<[a-zA-Z0-9]*>/createTarea             controllers.TareaController.createTarea(usuario)
+POST     /tarea             controllers.TareaController.createTarea()
 
 # Modificar tarea
-PUT      /tarea/:texto                                        controllers.TareaController.updateTarea(texto)
+PUT      /tareas/:texto                                        controllers.TareaController.updateTarea(texto)
 
 # Añadir usuario a tarea
 PUT      /tareaUsuario/$texto<[a-zA-Z0-9]*>/$usuario<[a-zA-Z0-9]*>   controllers.TareaController.anadirUsuario(texto,usuario)
@@ -52,4 +58,5 @@ PUT      /tareaTags/$texto<[a-zA-Z0-9]*>/$tag<[a-zA-Z0-9]*>   controllers.TareaC
 #PUT      /tarea/$texto<[a-zA-Z0-9]*>   					  controllers.TareaController.anadirUsuarios(texto)
 
 # Borrar tarea
-POST     /tarea/:texto                                        controllers.TareaController.deleteTarea(texto)
+DELETE     /tareas/:texto                                        controllers.TareaController.deleteTarea(texto)
+

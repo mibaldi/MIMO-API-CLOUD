@@ -1,23 +1,25 @@
 
 @(t:TareaModel)
-<tarea>
-	<id>
-		@t.id
-	</id>
-	<texto>
-		@t.texto
-	</texto>
-	@if(t.usuarios.isEmpty){
-	<usuarios>Sin usuarios</usuarios>
-	}else{
+<tarea id="@t.id">
+	<titulo>
+		@t.titulo
+	</titulo>
+	<descripcion>
+		@t.descripcion
+	</descripcion>
+	<fechaCreacion>
+		@t.fechacreacion
+	</fechaCreacion>
+	<fechaFin>
+		@t.fechafin
+	</fechaFin>
+	@if(!t.usuarios.isEmpty){
 	<usuarios>
 	@for(u <- t.usuarios){
-		<usuario>@u.getNombre</usuario>}
+		<usuario>@u.getUsername</usuario>}
 	</usuarios>
 	}
-	@if(t.tagsTarea.isEmpty){
-	<tags>Sin tags</tags>
-	}else{
+	@if(!t.tagsTarea.isEmpty){
 	<tags>
 	@for(tg <- t.tagsTarea){
 		<tag>@tg.tag</tag>}

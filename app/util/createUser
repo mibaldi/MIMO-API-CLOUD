@@ -1,23 +1,28 @@
 {
+"username":"mibaldi",
   "nombre": "Mikel",
   "edad": 24,
   "pass": {
     "contrasenia": "12345678"
   },
+"telefono":"123456789",
   "emails": [
     {
-      "email": "e1"
+      "email": "e1@h.com"
     },
     {
-      "email": "e2"
+      "email": "e2@d.es"
     }
   ],
   "tareasUsuario": [
     {
-      "texto": "aaaa"
+      "titulo": "tarea1",
+      "descripcion":"comprar pan"
+      "fechafin": "23-12-2015"
     },
     {
-      "texto": "bbbb"
+      "titulo": "tarea2",
+      "descripcion":"comprar pescado"
     }
   ]
 }

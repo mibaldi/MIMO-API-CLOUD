@@ -1,15 +1,19 @@
 package models;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import play.data.format.Formats;
+import play.data.validation.Constraints.ValidateWith;
+import validators.TareaValidator;
 
-import models.TareaModel.TareaJSON;
-
+import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Find;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -19,8 +23,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 public class TareaModel extends Model {
 	@Id
 	public Long id;
-	public String texto;
-	
+	@ValidateWith(value = TareaValidator.class, message = "tarea ya creada")
+	public String titulo;
+	public String descripcion;
+	public Date fechacreacion;
+	@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
+	public Date fechafin;
 	@ManyToMany(mappedBy = "tareasUsuario")
 	@JsonBackReference
 	public Set<UsuarioModel> usuarios;
@@ -30,8 +38,11 @@ public class TareaModel extends Model {
 
 	public TareaModel() {
 		super();
+		
+		this.fechacreacion=new Date();
+		System.out.println(this.fechacreacion);
 	}
-	
+
 	public static void create(TareaModel tarea) {
 		tarea.save();
 	}
@@ -44,31 +55,46 @@ public class TareaModel extends Model {
 	}
 
 	public static TareaModel findByNombre(String texto) {
-		if (find.where().eq("texto", texto).findList().size() == 0) {
+		if (find.where().eq("titulo", texto).findList().size() == 0) {
 			return null;
 		} else {
-			return find.where().eq("texto", texto).findList().get(0);
+			return find.where().eq("titulo", texto).findList().get(0);
 		}
 	}
-	public static List<TareaModel> findByUsuario(UsuarioModel usuario) {
-		
-		if (find.where().eq("usuarios", usuario).findList().size() == 0) {
-			return null;
-		} else {
-			return find.where().eq("usuarios", usuario).findList();
+
+	public static List<TareaModel> findByUsuario(List<UsuarioModel>listaUsuarios,UsuarioModel usuario) {
+		List<TareaModel> lista = find.where().eq("usuarios", usuario)
+				.findList();
+		for (UsuarioModel u : listaUsuarios){
+			List<TareaModel> listaAux = find.where().eq("usuarios", u).findList();
+			lista.retainAll(listaAux);
 		}
+		return lista;
 	}
-	public static List<TareaModel> findByTag(TagsModel tag) {
-		
-		if (find.where().eq("tagsTarea", tag).findList().size() == 0) {
-			return null;
-		} else {
-			return find.where().eq("tagsTarea", tag).findList();
+
+	public static List<TareaModel> findBy(Map<String, String> map) {
+		ExpressionList<TareaModel> listaBuscada = find.where();
+		for (String key : map.keySet()) {
+			listaBuscada.eq(key, map.get(key));
 		}
+		return listaBuscada.findList();
+
+	}
+
+	public static List<TareaModel> findByTag(List<TagsModel> tags,
+			UsuarioModel u) {
+		if (tags.isEmpty()) {
+			return find.where().eq("usuarios", u).findList();
+		}
+		return find.where().eq("usuarios", u).in("tagsTarea", tags).findList();
+
 	}
 
 	public static List<TareaModel> all() {
 		return find.all();
+	}
+	public static Integer numeroTareas(UsuarioModel u) {
+		return find.where().eq("usuarios",u).findRowCount();
 	}
 
 	public static Boolean existe(String texto) {
@@ -76,22 +102,26 @@ public class TareaModel extends Model {
 	}
 
 	public void addUsuario(UsuarioModel usuario) {
+
 		usuarios.add(usuario);
 		usuario.addTarea(this);
 	}
+
 	public void addTag(TagsModel tag) {
 		tagsTarea.add(tag);
 	}
+
 	public boolean changeData(TareaModel newData) {
 		boolean changed = false;
-		
-		if (newData.texto != null) {
-			this.texto = newData.texto;
+
+		if (newData.descripcion != null) {
+			this.descripcion = newData.descripcion;
 			changed = true;
 		}
-		
+
 		return changed;
 	}
+
 	public Long getId() {
 		return id;
 	}
@@ -100,12 +130,20 @@ public class TareaModel extends Model {
 		this.id = id;
 	}
 
-	public String getTexto() {
-		return texto;
+	public String getTitulo() {
+		return titulo;
 	}
 
-	public void setTexto(String texto) {
-		this.texto = texto;
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 
 	public Set<UsuarioModel> getUsuarios() {
@@ -127,15 +165,37 @@ public class TareaModel extends Model {
 	public static Find<Long, TareaModel> getFind() {
 		return find;
 	}
-	public static class TareaJSON{
-		public String texto;
-		public List<String> Tags;
-		public List<String> Usuarios;
-		public TareaJSON(String texto, List<String> tags , List<String> usuarios){
-			this.texto=texto;
-			this.Usuarios=usuarios;
-			this.Tags=tags;
+
+	public Date getFechacreacion() {
+		return fechacreacion;
+	}
+
+	public void setFechacreacion(Date fechacreacion) {
+		this.fechacreacion = fechacreacion;
+	}
+
+	public Date getFechafin() {
+		return fechafin;
+	}
+
+	public void setFechafin(Date fechafin) {
+		this.fechafin = fechafin;
+	}
+
+	/*@Override
+	public boolean equals(Object o) {
+		if ((o instanceof TareaModel)
+				&& (((TareaModel) o).getId() == this.id)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
-}
 
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		hash = (int) (97 * hash + this.id);
+		return hash;
+	}*/
+}
