@@ -29,9 +29,9 @@ public class TareaModel extends Model {
 	@Required
 	public String titulo;
 	public String descripcion;
-	public Date fechacreacion= new Date();
-	@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
-	public Date fechafin;
+	//public Date fechacreacion= new Date();
+	//@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
+	//public Date fechafin;
 	@ManyToMany(mappedBy = "tareasUsuario")
 	@JsonBackReference
 	public Set<UsuarioModel> usuarios;
@@ -122,10 +122,10 @@ public class TareaModel extends Model {
 			this.descripcion = newData.descripcion;
 			changed = true;
 		}
-		if (newData.fechafin !=null){
+		/*if (newData.fechafin !=null){
 			this.fechafin = newData.fechafin;
 			changed=true;
-		}
+		}*/
 
 		return changed;
 	}
@@ -184,7 +184,7 @@ public class TareaModel extends Model {
 		return find;
 	}
 
-	public Date getFechacreacion() {
+	/*public Date getFechacreacion() {
 		return fechacreacion;
 	}
 
@@ -198,22 +198,6 @@ public class TareaModel extends Model {
 
 	public void setFechafin(Date fechafin) {
 		this.fechafin = fechafin;
-	}
-
-	/*@Override
-	public boolean equals(Object o) {
-		if ((o instanceof TareaModel)
-				&& (((TareaModel) o).getId() == this.id)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public int hashCode() {
-		int hash = 7;
-		hash = (int) (97 * hash + this.id);
-		return hash;
 	}*/
+
 }
