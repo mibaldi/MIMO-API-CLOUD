@@ -30,6 +30,21 @@ public class EmailModel extends Model{
 	public void setUsuario(UsuarioModel usuario) {
 		this.usuario = usuario;
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if ((obj instanceof EmailModel) && (((EmailModel) obj).getEmail() == this.getEmail())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	@Override
+	public int hashCode() {
+		int hash = 7;
+		int value=this.email.hashCode();
+		hash = (int) (97 * hash + value);
+		return hash;
+	}
 	@ValidateWith(value=EmailValidator.class, message="email existente o con formato erroneo")
 	public String email;
 	@ManyToOne

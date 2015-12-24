@@ -3,8 +3,12 @@ package models;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -28,9 +32,9 @@ public class UsuarioModel  extends Model{
 	@NumeroTelefono
 	public String telefono;
 	@OneToOne(cascade=CascadeType.ALL)
-	@Valid
 	@JsonManagedReference
 	@Required
+	@Valid
 	public PasswordModel pass;
 	@JsonIgnore
 	public String TOKEN="";
@@ -44,40 +48,36 @@ public class UsuarioModel  extends Model{
 	public List<TareaModel> tareasUsuario;
 	public UsuarioModel(){}
 	public static void create(UsuarioModel usuario) {
+		usuario.pass.contrasenia=PasswordModel.hash(usuario.pass.contrasenia);
 		usuario.save();
 	}
-	/*public String validate() {
-		int i=0;
-		ArrayList<String> lista=new ArrayList<String>();
+	public String validate(){
 		if (!emails.isEmpty()){
-			String regex="^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-			for (EmailModel e:emails){
-				if (!e.email.matches(regex)){
-					i++;
-					lista.add(e.email + " formato incorrecto");
-				}else{
-					if (EmailModel.existe(e.email)) {
-						i++;
-						lista.add(e.email + " email existente");
-					}
-				}
+			 Map<Integer, EmailModel> mapemails = new HashMap<Integer, EmailModel>(emails.size());
+			 for(EmailModel e : emails) {	 
+				 mapemails.put(e.hashCode(), e);
+			 }
+			 emails.clear();
+			 for(Entry<Integer, EmailModel> e2 : mapemails.entrySet()) {
+				 emails.add(e2.getValue());
+			 }
+		}
+		return null;
+	}
+	
+	public static List<UsuarioModel> listaUserExistentes(String usuarios,UsuarioModel uLogin){
+		
+		List<UsuarioModel> listaUsuarios=new ArrayList<UsuarioModel>();
+		listaUsuarios.add(uLogin);
+		List<String> UsuariosNombre=Arrays.asList(usuarios.split("\\s*,\\s*"));
+		for (String nombre:UsuariosNombre){
+			UsuarioModel u = UsuarioModel.findByUsername(nombre);
+			if (u!=null){
+				listaUsuarios.add(u);
 			}
 		}
-		if (!tareasUsuario.isEmpty()){
-			for (TareaModel tarea:tareasUsuario){
-				if (TareaModel.existe(tarea.getTitulo())) {
-					i++;
-					lista.add(tarea.titulo + " formato incorrecto");
-		        }
-			}
-		}
-		if (i==0){
-			return null;
-		}
-		else return ("hay "+ Integer.toString(i) +" campos insertados incorrectamente : " + lista);
-    }*/
-	
-	
+		return listaUsuarios;
+	}
 
 	public static final Find<Long, UsuarioModel> find = new Find<Long, UsuarioModel>() {
 	};
@@ -114,7 +114,6 @@ public class UsuarioModel  extends Model{
 		if(find.where().eq("username", this.username).eq("tareasUsuario",tarea).findList().size()==0){
 			return null;
 		}else{
-			
 			return tarea;
 		}
 	}
@@ -122,10 +121,7 @@ public class UsuarioModel  extends Model{
 	public static Boolean auth(String username, PasswordModel pass){
 		UsuarioModel u= findByUsername(username);
 		if (u!=null){
-			if (u.pass.getContrasenia().compareTo(pass.getContrasenia())==0){
-				return true;
-			}
-			return false;
+			return PasswordModel.comprobar(pass.getContrasenia(),u.pass.getContrasenia());
 		}
 		return false;
 	}
@@ -140,10 +136,6 @@ public class UsuarioModel  extends Model{
 	public boolean changeData(UsuarioModel newData) {
 		boolean changed = false;
 		
-		if (newData.pass != null && !newData.pass.getContrasenia().equals(this.pass.getContrasenia())) {
-			this.pass = newData.pass;
-			changed = true;
-		}
 		if (newData.nombre != null) {
 			this.nombre = newData.nombre;
 			changed = true;

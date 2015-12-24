@@ -49,10 +49,10 @@ POST     /tarea             controllers.TareaController.createTarea()
 PUT      /tareas/:texto                                        controllers.TareaController.updateTarea(texto)
 
 # Añadir usuario a tarea
-PUT      /tareaUsuario/$texto<[a-zA-Z0-9]*>/$usuario<[a-zA-Z0-9]*>   controllers.TareaController.anadirUsuario(texto,usuario)
+PUT      /tareaUsuario/$texto<[a-zA-Z0-9_%\s]*>/$usuario<[a-zA-Z0-9_%\s]*>   controllers.TareaController.anadirUsuario(texto,usuario)
 
 # Añadir tag a tarea
-PUT      /tareaTags/$texto<[a-zA-Z0-9]*>/$tag<[a-zA-Z0-9]*>   controllers.TareaController.anadirTag(texto,tag)
+PUT      /tareaTags/$texto<[a-zA-Z0-9_%\s]*>/$tag<[a-zA-Z0-9_%\s]*>   controllers.TareaController.anadirTag(texto,tag)
 
 # Añadir usuarios a tarea
 #PUT      /tarea/$texto<[a-zA-Z0-9]*>   					  controllers.TareaController.anadirUsuarios(texto)

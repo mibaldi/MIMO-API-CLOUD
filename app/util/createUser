@@ -1,5 +1,5 @@
 {
-"username":"mibaldi",
+"username":"mibaldi4",
   "nombre": "Mikel",
   "edad": 24,
   "pass": {
@@ -8,17 +8,17 @@
 "telefono":"123456789",
   "emails": [
     {
-      "email": "e1@h.com"
+      "email": "e3@h.com"
     },
     {
-      "email": "e2@d.es"
+      "email": "e3@h.com"
     }
   ],
   "tareasUsuario": [
     {
       "titulo": "tarea1",
-      "descripcion":"comprar pan"
-      "fechafin": "23-12-2015"
+      "descripcion":"comprar pan",
+      "fechafin": "2015-12-25 12:00:00"
     },
     {
       "titulo": "tarea2",

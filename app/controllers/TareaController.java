@@ -26,13 +26,14 @@ public class TareaController extends Controller {
         return ok("hola");
     }
     /**
-	 * Action method para GET /tarea/<texto>.
+	 * Action method para GET /tareas/<texto>.
 	 * 
 	 * @param titulo de tarea a recuperar.
 	 */
     @Security.Authenticated(secured.class)
     public Result getTarea(String texto){
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	texto=texto.replaceAll("%20", " ");
     	TareaModel tt=u.tareaExistente(texto);
     	if (tt!=null){
     		if (request().accepts("application/xml")) {
@@ -55,22 +56,15 @@ public class TareaController extends Controller {
 	 */
     @Security.Authenticated(secured.class)
     public Result listaTareasUsuario(){
+    	
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
 			return notFound();
 		}
+		List<UsuarioModel> listaUsuarios = new ArrayList<UsuarioModel>();
 		String usuarios=request().getQueryString("users");
-		List<UsuarioModel> listaUsuarios=new ArrayList<UsuarioModel>();
-		listaUsuarios.add(usuario);
 		if (usuarios!=null){
-			List<String> UsuariosNombre=Arrays.asList(usuarios.split("\\s*,\\s*"));
-			for (String nombre:UsuariosNombre){
-				UsuarioModel u = UsuarioModel.findByUsername(nombre);
-				if (u == null) {
-					return notFound("usuario "+ nombre +" no encontrado");
-				}
-				listaUsuarios.add(u);
-			}
+			listaUsuarios=UsuarioModel.listaUserExistentes(usuarios, usuario);
 		}
 		Integer count = TareaModel.numeroTareas(usuario);
     	if (request().accepts("application/xml")) {
@@ -83,7 +77,7 @@ public class TareaController extends Controller {
 		}
     }
     /**
-	 * Action method para GET /tareas/tag
+	 * Action method para GET /tareasTag
 	 * @param tag nombre del tag dentro de las tareas.
 	 */
     @Security.Authenticated(secured.class)
@@ -95,14 +89,7 @@ public class TareaController extends Controller {
 		String tags=request().getQueryString("tags");
 		List<TagsModel> listaTags=new ArrayList<TagsModel>();
 		if (tags!=null){
-			List<String> TagsNombre=Arrays.asList(tags.split("\\s*,\\s*"));
-			for (String nombre:TagsNombre){
-				TagsModel tag = TagsModel.findByNombre(nombre);
-				if (tag == null) {
-					return notFound("tag "+ nombre +" no encontrado");
-				}
-				listaTags.add(tag);
-			}
+			listaTags=TagsModel.listaTagsExistentes(tags);
 		}
 		Integer count = TareaModel.numeroTareas(usuario);
     	if (request().accepts("application/xml")) {
@@ -131,20 +118,22 @@ public class TareaController extends Controller {
 			return badRequest(ControllerHelper.errorJson(2, "invalid_tarea", form.errorsAsJson()));
 		}
     	TareaModel tt=form.get();
-    	System.out.println(tt.titulo);
     	tt.addUsuario(usuario);
     	TareaModel.create(tt);		
-        return redirect(routes.TareaController.listaTareasUsuario());
+    	return ok("correcto");
+        //return redirect(routes.TareaController.listaTareasUsuario());
     }
     /**
 	 * Action method para PUT /tareas/<nombre>
 	 * Se deben pasar los atributos a modificar en el body de la petición. 
 	 * @param nombre titulo de la tarea a modificar.
 	 */
+    @Security.Authenticated(secured.class)
     public Result updateTarea(String texto){
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
-    	if (tarea!=null){
+    	if (tarea==null){
     		return notFound();
     	}
     	
@@ -172,31 +161,35 @@ public class TareaController extends Controller {
     	if (uu == null) {
 			return notFound("Usuario no valido");
 		}
-    	TareaModel tarea = TareaModel.findByNombre(texto);
+    	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	texto=texto.replaceAll("%20", " ");
+    	TareaModel tarea=u.tareaExistente(texto);
 		if (tarea == null) {
 			return notFound("Tarea no valida");
 		}
-		tarea.addUsuario(uu);
-    	TareaModel.create(tarea);		
-        return redirect(routes.TareaController.getTarea(tarea.titulo));
+		tarea.añadirUsuario(uu);
+		return ok("usuario añadido");
+       // return redirect(routes.TareaController.getTarea(tarea.titulo));
     }
     /**
 	 * Action method para PUT /tareaTags/<texto>/<tag>
 	 * @param texto= nombre tarea a modificar, tag= tag del tag a agregar a la tarea
 	 */
+    @Security.Authenticated(secured.class)
     public Result anadirTag(String texto,String tag){
     	TagsModel t = TagsModel.findByNombre(tag);
     	if (t == null) {
-			t=new TagsModel(tag);
-			t.save();
+			t=TagsModel.crearTag(tag);
 		}
-    	TareaModel tarea = TareaModel.findByNombre(texto);
+    	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	texto=texto.replaceAll("%20", " ");
+    	TareaModel tarea=u.tareaExistente(texto);
 		if (tarea == null) {
-			return notFound();
+			return notFound("Tarea no valida");
 		}
-		t.addTarea(tarea);
-    	TagsModel.create(t);		
-        return redirect(routes.TareaController.listaTareasUsuario());
+		t.añadirTarea(tarea);	
+		return ok("tag añadido");
+        //return redirect(routes.TareaController.listaTareasUsuario());
     }
     /**
 	 * Action method para DELETE /tareas/:texto
@@ -207,11 +200,10 @@ public class TareaController extends Controller {
     @Security.Authenticated(secured.class)
     public Result deleteTarea(String texto){
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	texto=texto.replaceAll("%20", " ");
     	TareaModel tt=u.tareaExistente(texto);
     	if (tt!=null){
-    		u.tareasUsuario.remove(tt);
-    		u.save();
-    		tt.delete();
+    		TareaModel.borrarTarea(u, tt);
     		return ok("Tarea Borrada");
     	}else{
     		return unauthorized("no existe la tarea para el usuario logeado");

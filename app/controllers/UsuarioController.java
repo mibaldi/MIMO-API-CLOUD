@@ -15,6 +15,7 @@ import models.PasswordModel;
 import models.TareaModel;
 import models.UsuarioModel;
 import play.*;
+import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.*;
@@ -142,9 +143,10 @@ public class UsuarioController extends Controller {
 		if (form.hasErrors()) {
 			return badRequest(ControllerHelper.errorJson(2, "invalid_user", form.errorsAsJson()));
 		}
+		
 		UsuarioModel uu = form.get();
-		System.out.println(uu.username);
 		if (!UsuarioModel.existe(uu.username)) {
+			
 			UsuarioModel.create(uu);
 			return ok("correcto");
 		} else {

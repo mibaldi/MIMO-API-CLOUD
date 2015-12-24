@@ -9,7 +9,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+
 import play.data.format.Formats;
+import play.data.validation.Constraints.Required;
 import play.data.validation.Constraints.ValidateWith;
 import validators.TareaValidator;
 
@@ -24,9 +26,10 @@ public class TareaModel extends Model {
 	@Id
 	public Long id;
 	@ValidateWith(value = TareaValidator.class, message = "tarea ya creada")
+	@Required
 	public String titulo;
 	public String descripcion;
-	public Date fechacreacion;
+	public Date fechacreacion= new Date();
 	@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
 	public Date fechafin;
 	@ManyToMany(mappedBy = "tareasUsuario")
@@ -38,9 +41,6 @@ public class TareaModel extends Model {
 
 	public TareaModel() {
 		super();
-		
-		this.fechacreacion=new Date();
-		System.out.println(this.fechacreacion);
 	}
 
 	public static void create(TareaModel tarea) {
@@ -83,9 +83,9 @@ public class TareaModel extends Model {
 
 	public static List<TareaModel> findByTag(List<TagsModel> tags,
 			UsuarioModel u) {
-		if (tags.isEmpty()) {
+		/*if (tags.isEmpty()) {
 			return find.where().eq("usuarios", u).findList();
-		}
+		}*/
 		return find.where().eq("usuarios", u).in("tagsTarea", tags).findList();
 
 	}
@@ -106,6 +106,10 @@ public class TareaModel extends Model {
 		usuarios.add(usuario);
 		usuario.addTarea(this);
 	}
+	public void añadirUsuario(UsuarioModel user){
+		this.addUsuario(user);;
+    	this.update();	
+	}
 
 	public void addTag(TagsModel tag) {
 		tagsTarea.add(tag);
@@ -118,8 +122,22 @@ public class TareaModel extends Model {
 			this.descripcion = newData.descripcion;
 			changed = true;
 		}
+		if (newData.fechafin !=null){
+			this.fechafin = newData.fechafin;
+			changed=true;
+		}
 
 		return changed;
+	}
+	
+	public static void borrarTarea(UsuarioModel u, TareaModel tt){
+		u.tareasUsuario.remove(tt);
+		u.update();
+		if (tt.usuarios.size() >= 1){
+			tt.usuarios.remove(u);
+		}else{
+			tt.delete();
+		}
 	}
 
 	public Long getId() {
