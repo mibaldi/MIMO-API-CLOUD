@@ -1,11 +1,13 @@
 package models;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -29,9 +31,10 @@ public class TareaModel extends Model {
 	@Required
 	public String titulo;
 	public String descripcion;
-	//public Date fechacreacion= new Date();
-	//@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
-	//public Date fechafin;
+	@Column(columnDefinition = "datetime")
+	public Timestamp fechacreacion= new Timestamp(new Date().getTime());
+	@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
+	public Timestamp fechafin;
 	@ManyToMany(mappedBy = "tareasUsuario")
 	@JsonBackReference
 	public Set<UsuarioModel> usuarios;
@@ -122,10 +125,10 @@ public class TareaModel extends Model {
 			this.descripcion = newData.descripcion;
 			changed = true;
 		}
-		/*if (newData.fechafin !=null){
+		if (newData.fechafin !=null){
 			this.fechafin = newData.fechafin;
 			changed=true;
-		}*/
+		}
 
 		return changed;
 	}
@@ -184,12 +187,13 @@ public class TareaModel extends Model {
 		return find;
 	}
 
-	/*public Date getFechacreacion() {
+	public Date getFechacreacion() {
 		return fechacreacion;
 	}
 
 	public void setFechacreacion(Date fechacreacion) {
-		this.fechacreacion = fechacreacion;
+		
+		this.fechacreacion = new Timestamp(fechacreacion.getTime());
 	}
 
 	public Date getFechafin() {
@@ -197,7 +201,7 @@ public class TareaModel extends Model {
 	}
 
 	public void setFechafin(Date fechafin) {
-		this.fechafin = fechafin;
-	}*/
+		this.fechafin = new Timestamp(fechafin.getTime());
+	}
 
 }

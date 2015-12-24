@@ -13,9 +13,9 @@
 		@u.pass.getContrasenia
 	</password>
 	<tareas>
-		@for(t <- u.tareasUsuario){<tarea>@t.getTitulo</tarea>}
+		@for(t <- u.tareasUsuario){<tarea>@t.titulo</tarea>}
 	</tareas>
 	<emails>
-		@for(e <- u.emails){<email>@e.getEmail</email>}
+		@for(e <- u.emails){<email>@e.email</email>}
 	</emails>
 </usuario>
