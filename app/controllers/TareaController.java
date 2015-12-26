@@ -16,6 +16,7 @@ import models.TareaModel;
 import models.UsuarioModel;
 import play.*;
 import play.data.Form;
+import play.i18n.Messages;
 import play.libs.Json;
 import play.mvc.*;
 import util.secured;
@@ -33,6 +34,10 @@ public class TareaController extends Controller {
     @Security.Authenticated(secured.class)
     public Result getTarea(String texto){
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	if (u==null){
+    		String UserNoLogeado=Messages.get("UserNoLogeado",u);
+			return notFound(UserNoLogeado);
+    	}
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tt=u.tareaExistente(texto);
     	if (tt!=null){
@@ -44,12 +49,11 @@ public class TareaController extends Controller {
     			return ok(Json.toJson(result));
     		}
     		else {
-    			return badRequest("Unsupported format");
+    			String format=Messages.get("Formato");
+				return badRequest(format);
     		}
     	}
-    	else {
     		return unauthorized("no existe la tarea para el usuario logeado");
-    	}
     }
     /**
 	 * Action method para GET /tareas
@@ -59,7 +63,8 @@ public class TareaController extends Controller {
     	
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
-			return notFound();
+			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
+			return notFound(UserNoLogeado);
 		}
 		List<UsuarioModel> listaUsuarios = new ArrayList<UsuarioModel>();
 		String usuarios=request().getQueryString("users");
@@ -73,7 +78,8 @@ public class TareaController extends Controller {
 			JsonNode jn = play.libs.Json.toJson(TareaJSON.convertir(TareaModel.findByUsuario(listaUsuarios,usuario)));
 			return ok(jn);
 		} else {
-			return badRequest("Unsupported format");
+			String format=Messages.get("Formato");
+			return badRequest(format);
 		}
     }
     /**
@@ -84,7 +90,8 @@ public class TareaController extends Controller {
     public Result listaTareasTag(){
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
-			return notFound();
+			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
+			return notFound(UserNoLogeado);
 		}
 		String tags=request().getQueryString("tags");
 		List<TagsModel> listaTags=new ArrayList<TagsModel>();
@@ -98,7 +105,8 @@ public class TareaController extends Controller {
 			JsonNode jn = play.libs.Json.toJson(TareaJSON.convertir(TareaModel.findByTag(listaTags,usuario)));
 			return ok(jn);
 		} else {
-			return badRequest("Unsupported format");
+			String format=Messages.get("Formato");
+			return badRequest(format);
 		}
     }
   
@@ -111,7 +119,8 @@ public class TareaController extends Controller {
     public Result createTarea() {
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (usuario==null){
-    		return Results.notFound("usuario no logeado");
+    		String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
+			return notFound(UserNoLogeado);
     	}
     	Form<TareaModel> form = Form.form(TareaModel.class).bindFromRequest();
     	if (form.hasErrors()) {
@@ -119,8 +128,9 @@ public class TareaController extends Controller {
 		}
     	TareaModel tt=form.get();
     	tt.addUsuario(usuario);
-    	TareaModel.create(tt);		
-    	return ok("correcto");
+    	TareaModel.create(tt);
+    	String correcto=Messages.get("CreacionCorrecta");
+    	return ok(correcto);
         //return redirect(routes.TareaController.listaTareasUsuario());
     }
     /**
@@ -131,6 +141,10 @@ public class TareaController extends Controller {
     @Security.Authenticated(secured.class)
     public Result updateTarea(String texto){
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	if (u==null){
+    		String UserNoLogeado=Messages.get("UserNoLogeado",u);
+			return notFound(UserNoLogeado);
+    	}
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
     	if (tarea==null){
@@ -144,7 +158,8 @@ public class TareaController extends Controller {
 		Result res;
 		if (tarea.changeData(form.get())) {
 			tarea.update();
-			res = ok("tarea modificada");
+			String correcto=Messages.get("ModificacionCorrecta");
+			res = ok(correcto);
 		}
 		else {
 			res = status(NOT_MODIFIED);
@@ -157,11 +172,16 @@ public class TareaController extends Controller {
 	 */
     @Security.Authenticated(secured.class)
     public Result anadirUsuario(String texto,String usuario){
+    	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	if (u==null){
+    		String UserNoLogeado=Messages.get("UserNoLogeado",u);
+			return notFound(UserNoLogeado);
+    	}
     	UsuarioModel uu = UsuarioModel.findByUsername(usuario);
     	if (uu == null) {
-			return notFound("Usuario no valido");
+    		String UserNoEncontrado=Messages.get("UserNoEncontrado",uu);
+			return notFound(UserNoEncontrado);
 		}
-    	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
 		if (tarea == null) {
@@ -178,10 +198,14 @@ public class TareaController extends Controller {
     @Security.Authenticated(secured.class)
     public Result anadirTag(String texto,String tag){
     	TagsModel t = TagsModel.findByNombre(tag);
+    	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	if (u==null){
+    		String UserNoLogeado=Messages.get("UserNoLogeado",u);
+			return notFound(UserNoLogeado);
+    	}
     	if (t == null) {
 			t=TagsModel.crearTag(tag);
 		}
-    	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
 		if (tarea == null) {
@@ -200,59 +224,19 @@ public class TareaController extends Controller {
     @Security.Authenticated(secured.class)
     public Result deleteTarea(String texto){
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
+    	if (u==null){
+    		String UserNoLogeado=Messages.get("UserNoLogeado",u);
+			return notFound(UserNoLogeado);
+    	}
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tt=u.tareaExistente(texto);
     	if (tt!=null){
     		TareaModel.borrarTarea(u, tt);
-    		return ok("Tarea Borrada");
+    		String correcto=Messages.get("BorradoCorrecta");
+    		return ok(correcto);
     	}else{
     		return unauthorized("no existe la tarea para el usuario logeado");
     	}
     }
-    /*  public Result listaTareas(){
-	Map<String,String> map= new HashMap<String,String>();
-	String nombre=request().getQueryString("texto");
-	if (nombre!=null){
-		map.put("texto", nombre);
-	}
-	if (request().accepts("application/xml")) {
-		return ok(views.xml.vistaTareas.render(TareaModel.findBy(map)));
-	} else if (request().accepts("application/json")) {
-		List<TareaJSON> tJsonArray = new ArrayList<TareaJSON>();
-		for (TareaModel t:TareaModel.findBy(map)){
-			TareaJSON tJson= new TareaJSON(t);
-			tJsonArray.add(tJson);
-		}
-		JsonNode jn = play.libs.Json.toJson(tJsonArray);
-		return ok(jn);
-	} else {
-		return badRequest("Unsupported format");
-	}
-}*/
-    /*public Result anadirUsuarios(String texto){
-	String name;
-	JsonNode json = request().body().asJson();
-	if (json == null) {
-		return badRequest("Expecting Json data");
-	} else {
-		name = json.findPath("usuario").textValue();
-	}
-	if (name==null){
-		
-	}else{
-		
-	}
-	UsuarioModel uu = UsuarioModel.findByNombre(usuario);
-	if (usuario == null) {
-		return notFound();
-	}
-	TareaModel tarea = TareaModel.findByNombre(texto);
-	if (tarea == null) {
-		return notFound();
-	}
-	tarea.addUsuario(uu);
-	TareaModel.create(tarea);		
-    return redirect(routes.TareaController.listaTareas());
-}*/
 
 }

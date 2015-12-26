@@ -1,6 +1,7 @@
 package controllers;
 
 import helpers.ControllerHelper;
+import play.i18n.Messages;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,16 +12,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.EmailModel;
-import models.PasswordModel;
 import models.TareaModel;
 import models.UsuarioModel;
-import play.*;
-import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.*;
-import play.mvc.Http.RequestBody;
-import scala.Option;
 import util.secured;
 
 public class UsuarioController extends Controller {
@@ -37,7 +33,6 @@ public class UsuarioController extends Controller {
 		Form<UsuarioModel> form = Form.form(UsuarioModel.class)
 				.bindFromRequest();
 		if (form.hasErrors()) {
-			System.out.println("erorrrrr");
 			return badRequest(form.errorsAsJson());
 		}
 		UsuarioModel uu = form.get();
@@ -50,11 +45,13 @@ public class UsuarioController extends Controller {
 				jn.put("TOKEN", uu.TOKEN);
 				return ok(jn);
 			} else {
-				return badRequest("Unsupported format");
+				String format=Messages.get("Formato");
+				return badRequest(format);
 			}
 			
 		}
-		return notFound("No se encuentra un usuario con ese username o password");
+		String auth=Messages.get("Login");
+		return notFound(auth);
 		//return redirect(routes.UsuarioController.login());
 	}
 	/**
@@ -65,7 +62,8 @@ public class UsuarioController extends Controller {
 	public Result logout(){
 		UsuarioModel ubd=(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		ubd.borrarToken();
-		return ok("desconectado");
+		String logout=Messages.get("Logout");
+		return ok(logout);
 	}
 	
 	/**
@@ -84,11 +82,13 @@ public class UsuarioController extends Controller {
 				JsonNode jn = play.libs.Json.toJson(u);
 				return ok(jn);
 			} else {
-				return badRequest("Unsupported format");
+				String format=Messages.get("Formato");
+				return badRequest(format);
 			}
 
 		} else {
-			return notFound("usuario no existe");
+			String UserNoEncontrado=Messages.get("UserNoEncontrado",u);
+			return notFound(UserNoEncontrado);
 		}
 
 	}
@@ -130,7 +130,8 @@ public class UsuarioController extends Controller {
 					result.put("lista", lu);
 					return ok(Json.toJson(result));
 				} else {
-					return badRequest("Unsupported format");
+					String format=Messages.get("Formato");
+					return badRequest(format);
 				}
 	}
 	/**
@@ -148,7 +149,8 @@ public class UsuarioController extends Controller {
 		if (!UsuarioModel.existe(uu.username)) {
 			
 			UsuarioModel.create(uu);
-			return ok("correcto");
+			String correcto=Messages.get("CreacionCorrecta");
+			return ok(correcto);
 		} else {
 			return status(CONFLICT, "Usuario ya existente");
 		}
@@ -163,7 +165,8 @@ public class UsuarioController extends Controller {
 	public Result update() {
 		UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
-			return notFound();
+			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
+			return notFound(UserNoLogeado);
 		}
 		
 		Form<UsuarioModel> form = Form.form(UsuarioModel.class).bindFromRequest();
@@ -187,7 +190,8 @@ public class UsuarioController extends Controller {
 		}
 		if (usuario.changeData(u) || email ) {
 			usuario.update();
-			res = ok("Modificacion realizada");
+			String correcto=Messages.get("ModificacionCorrecta");
+			res = ok(correcto);
 		}
 		else {
 			res = status(NOT_MODIFIED);
@@ -203,10 +207,12 @@ public class UsuarioController extends Controller {
 	public Result delete(){
 		UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
-			return notFound();
+			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
+			return notFound(UserNoLogeado);
 		}
 		List<UsuarioModel>lista= new ArrayList<UsuarioModel>();
 		List<TareaModel> listaTareas=TareaModel.findByUsuario(lista,usuario);
+		String correcto=Messages.get("BorradoCorrecta");
 		if (listaTareas!=null){
 			List<TareaModel> tareasEliminar=new ArrayList<TareaModel>();
 			for (TareaModel t:listaTareas){
@@ -220,43 +226,14 @@ public class UsuarioController extends Controller {
 			for (TareaModel tEliminar:tareasEliminar){
 				tEliminar.delete();
 			}
-			return ok("Usuario Borrado junto con las siguientes tareas " + tareasEliminar);
+			
+			return ok(correcto +" junto con las siguientes tareas " + tareasEliminar);
 		}else{
 			usuario.delete();
 		}
 		
 		
 		
-		return ok("Usuario Borrado");
+		return ok(correcto);
 	}
-	
-	/*public Result delete(String nombre,String format) {
-	RequestBody body = request().body();
-	System.out.println(format);
-	if (format.compareTo("plain") == 0) {
-		String textBody = body.asText();
-		 if(textBody != null) {
-			   return ok("Got: " + textBody);
-			  } else {
-			    return badRequest("Expecting text/plain request body");
-			  }
-	} else if (format.compareTo("json") == 0) {
-		JsonNode json = request().body().asJson();
-		if (json == null) {
-			return badRequest("Expecting Json data");
-		} else {
-			String name = json.findPath("S").textValue();
-			if (name == null) {
-				return badRequest("Missing parameter [name]");
-			} else {
-				return ok("Hello " + name);
-			}
-		}
-	}else{
-		return badRequest("Unsupported format: use format=plain or format=json");
-	}
-
-	// System.out.println("borrado "+nombre);
-	// return redirect(routes.Application.index());
-}*/
 }
