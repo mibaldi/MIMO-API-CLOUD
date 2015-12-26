@@ -1,0 +1,8 @@
+UserNoEncontrado=There was an error, the user = {0} is not in the database
+UserNoLogeado=To access this resource you need to login
+Formato=Invalid format
+Login=A user is not found with this username or password
+Logout=Offline
+CreacionCorrecta=Creating completed successfully
+ModificacionCorrecta=Modification completed successfully
+BorradoCorrecta=Erasing successful
