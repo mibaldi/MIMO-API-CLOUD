@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import models.TagsModel;
 import models.TareaModel;
 import models.UsuarioModel;
 public class TareaJSON{
+		@JsonIgnore
 		public Long id;
 		public String titulo;
 		public String descripcion;

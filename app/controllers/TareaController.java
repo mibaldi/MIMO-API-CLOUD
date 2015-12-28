@@ -2,6 +2,7 @@ package controllers;
 
 import helpers.ControllerHelper;
 import helpers.TareaJSON;
+import io.swagger.annotations.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,7 +21,7 @@ import play.i18n.Messages;
 import play.libs.Json;
 import play.mvc.*;
 import util.secured;
-
+@Api(value = "/tarea",consumes="application/xml,application/json",produces="application/xml,application/json")
 public class TareaController extends Controller {
 
     public Result index() {
@@ -31,8 +32,13 @@ public class TareaController extends Controller {
 	 * 
 	 * @param titulo de tarea a recuperar.
 	 */
-    @Security.Authenticated(secured.class)
-    public Result getTarea(String texto){
+    @ApiOperation(nickname = "getTarea",value = "get tarea",notes = "muestra la tarea del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN",response=models.TareaModel.class, httpMethod = "GET")
+    @ApiImplicitParams({
+		@ApiImplicitParam(name="users",value="username de los usuarios",required = true, dataType = "array", paramType ="query"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})@Security.Authenticated(secured.class)
+    public Result getTarea(@ApiParam(value = "titulo de la tarea") String texto){
+    	ControllerHelper.headers(response());
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (u==null){
     		String UserNoLogeado=Messages.get("UserNoLogeado",u);
@@ -58,9 +64,14 @@ public class TareaController extends Controller {
     /**
 	 * Action method para GET /tareas
 	 */
+    @ApiOperation(nickname = "listaTareasUsuarios",value = "get lista tareas usuarios",notes = "muestra la lista de tareas de usuarios, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "GET")
+    @ApiImplicitParams({
+		@ApiImplicitParam(name="users",value="username de los usuarios",required = true, dataType = "array", paramType ="query"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
     public Result listaTareasUsuario(){
-    	
+    	ControllerHelper.headers(response());
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
 			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
@@ -86,8 +97,14 @@ public class TareaController extends Controller {
 	 * Action method para GET /tareasTag
 	 * @param tag nombre del tag dentro de las tareas.
 	 */
+    @ApiOperation(nickname = "listaTareasTag",value = "get lista tareas tag",notes = "muestra la lista de tareas con los tags buscados, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "GET")
+    @ApiImplicitParams({
+		@ApiImplicitParam(name="tags",value="tags",required = true, dataType = "array", paramType ="query"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
     public Result listaTareasTag(){
+    	ControllerHelper.headers(response());
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
 			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
@@ -115,8 +132,14 @@ public class TareaController extends Controller {
 	 * Se deben pasar los atributos de la tarea en el body de la petición. 
 	 * 
 	 */
+    @ApiOperation(nickname = "createTarea",value = "crear tarea",notes = "crea una tarea y la asocia al usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+	@ApiImplicitParams({
+		@ApiImplicitParam(required = true, dataType = "helpers.TareaJSONswagger", paramType ="body"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
     public Result createTarea() {
+    	ControllerHelper.headers(response());
     	UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (usuario==null){
     		String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
@@ -138,8 +161,14 @@ public class TareaController extends Controller {
 	 * Se deben pasar los atributos a modificar en el body de la petición. 
 	 * @param nombre titulo de la tarea a modificar.
 	 */
+    @ApiOperation(nickname = "update",value = "modificar tarea",notes = "modifica una tarea existente del usuario, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+	@ApiImplicitParams({
+		@ApiImplicitParam(required = true, dataType = "helpers.TareaJSONswagger", paramType ="body"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
-    public Result updateTarea(String texto){
+    public Result updateTarea(@ApiParam(value = "titulo de la tarea")String texto){
+    	ControllerHelper.headers(response());
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (u==null){
     		String UserNoLogeado=Messages.get("UserNoLogeado",u);
@@ -170,8 +199,13 @@ public class TareaController extends Controller {
 	 * Action method para PUT /tareaUsuario/<texto>/<nombreUsuario>
 	 * @param texto= nombre tarea a modificar, nombreUsuario= username del usuario a agregar a la tarea
 	 */
+    @ApiOperation(nickname = "añadirUsuario",value = "añade usuario a tarea",notes = "Añade un usuario a una tarea existente del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+    @ApiImplicitParams({
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
     public Result anadirUsuario(String texto,String usuario){
+    	ControllerHelper.headers(response());
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (u==null){
     		String UserNoLogeado=Messages.get("UserNoLogeado",u);
@@ -195,8 +229,13 @@ public class TareaController extends Controller {
 	 * Action method para PUT /tareaTags/<texto>/<tag>
 	 * @param texto= nombre tarea a modificar, tag= tag del tag a agregar a la tarea
 	 */
+    @ApiOperation(nickname = "añadirTag",value = "añade tag a tarea",notes = "Añade un tag a una tarea existente del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+    @ApiImplicitParams({
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
     public Result anadirTag(String texto,String tag){
+    	ControllerHelper.headers(response());
     	TagsModel t = TagsModel.findByNombre(tag);
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (u==null){
@@ -221,8 +260,13 @@ public class TareaController extends Controller {
 	 * 
 	 * @param titulo de la tarea
 	 */
+    @ApiOperation(nickname = "borrarTarea",value = "borrar tarea",notes = "borra la tarea del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+    @ApiImplicitParams({
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
     @Security.Authenticated(secured.class)
-    public Result deleteTarea(String texto){
+    public Result deleteTarea(@ApiParam(value = "titulo de la tarea")String texto){
+    	ControllerHelper.headers(response());
     	UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
     	if (u==null){
     		String UserNoLogeado=Messages.get("UserNoLogeado",u);

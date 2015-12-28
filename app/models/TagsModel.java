@@ -12,10 +12,12 @@ import javax.persistence.ManyToMany;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Find;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class TagsModel extends Model {
 	@Id
+	@JsonIgnore
 	public Long id;
 	public String tag;
 	@ManyToMany(mappedBy = "tagsTarea")

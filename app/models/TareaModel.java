@@ -21,20 +21,28 @@ import com.avaje.ebean.ExpressionList;
 import com.avaje.ebean.Model;
 import com.avaje.ebean.Model.Find;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class TareaModel extends Model {
 	@Id
+	@JsonIgnore
 	public Long id;
 	@ValidateWith(value = TareaValidator.class, message = "tarea ya creada")
 	@Required
 	public String titulo;
 	public String descripcion;
-	@Column(columnDefinition = "datetime")
+	/*@Column(columnDefinition = "datetime")
 	public Timestamp fechacreacion= new Timestamp(new Date().getTime());
+	@Column(columnDefinition = "datetime")
 	@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
-	public Timestamp fechafin;
+	public Timestamp fechafin;*/
+	@Column(columnDefinition = "datetime")
+	public Date fechacreacion= new Timestamp(new Date().getTime());
+	@Column(columnDefinition = "datetime")
+	@Formats.DateTime(pattern="yyyy-MM-dd HH:mm:ss")
+	public Date fechafin;
 	@ManyToMany(mappedBy = "tareasUsuario")
 	@JsonBackReference
 	public Set<UsuarioModel> usuarios;
@@ -125,10 +133,10 @@ public class TareaModel extends Model {
 			this.descripcion = newData.descripcion;
 			changed = true;
 		}
-		if (newData.fechafin !=null){
+		/*if (newData.fechafin !=null){
 			this.fechafin = newData.fechafin;
 			changed=true;
-		}
+		}*/
 
 		return changed;
 	}
@@ -187,7 +195,7 @@ public class TareaModel extends Model {
 		return find;
 	}
 
-	public Date getFechacreacion() {
+	/*public Date getFechacreacion() {
 		return fechacreacion;
 	}
 
@@ -202,6 +210,6 @@ public class TareaModel extends Model {
 
 	public void setFechafin(Date fechafin) {
 		this.fechafin = new Timestamp(fechafin.getTime());
-	}
+	}*/
 
 }

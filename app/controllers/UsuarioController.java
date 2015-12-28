@@ -1,6 +1,13 @@
 package controllers;
 
 import helpers.ControllerHelper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponses;
 import play.i18n.Messages;
 
 import java.util.ArrayList;
@@ -12,13 +19,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.EmailModel;
+import models.PasswordModel;
 import models.TareaModel;
 import models.UsuarioModel;
 import play.data.Form;
 import play.libs.Json;
 import play.mvc.*;
 import util.secured;
-
+@Api(value = "/user",consumes="application/xml,application/json",produces="application/xml,application/json")
 public class UsuarioController extends Controller {
 	
 	public Result index() {
@@ -29,7 +37,12 @@ public class UsuarioController extends Controller {
 	 * Se deben pasar nombre y un objeto pass en el body de la petición. 
 	 * 
 	 */
+	@ApiOperation(nickname = "login",value = "logearse",notes = "Returns a token", httpMethod = "POST")
+	@ApiImplicitParams({
+		@ApiImplicitParam(required = true, dataType = "helpers.UsuarioJSON", paramType ="body")
+	})
 	public Result login(){
+		ControllerHelper.headers(response());
 		Form<UsuarioModel> form = Form.form(UsuarioModel.class)
 				.bindFromRequest();
 		if (form.hasErrors()) {
@@ -43,6 +56,7 @@ public class UsuarioController extends Controller {
 			} else if (request().accepts("application/json")) {
 				ObjectNode jn = play.libs.Json.newObject();
 				jn.put("TOKEN", uu.TOKEN);
+				
 				return ok(jn);
 			} else {
 				String format=Messages.get("Formato");
@@ -58,8 +72,13 @@ public class UsuarioController extends Controller {
 	 * Action method para GET /logout.
 	 * 
 	 */
+	@ApiOperation(nickname = "logout",value = "desconectarse",notes = "Borra el token del usuario", httpMethod = "GET")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
 	@Security.Authenticated(secured.class)
 	public Result logout(){
+		ControllerHelper.headers(response());
 		UsuarioModel ubd=(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		ubd.borrarToken();
 		String logout=Messages.get("Logout");
@@ -70,9 +89,13 @@ public class UsuarioController extends Controller {
 	 * Action method para GET /user.
 	 * 
 	 */
+	@ApiOperation(nickname = "getUser",value = "get usuario",notes = "muestra el usuario logeado",response=models.UsuarioModel.class, httpMethod = "GET")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
 	@Security.Authenticated(secured.class)
 	public Result getUser() {
-		
+			ControllerHelper.headers(response());
 			UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 			if(u !=null){
 			if (request().accepts("application/xml")) {
@@ -104,7 +127,13 @@ public class UsuarioController extends Controller {
 	 * 
 	 * @param pag número de página a recuperar.
 	 */
+	@ApiOperation(nickname = "listaUsuarios",value = "get lista usuario",notes = "muestra la lista usuarios", httpMethod = "GET")
+	 @ApiImplicitParams({
+			@ApiImplicitParam(name="nombre",value="nombre de los usuarios",required = true, dataType = "string", paramType ="query"),
+			@ApiImplicitParam(name="edad",value="edad de los usuarios",required = true, dataType = "string", paramType ="query")
+		})
 	public Result listaUsuarios(Integer pag) {
+		ControllerHelper.headers(response());
 		String paginaSize = request().getQueryString("size");
 		if (paginaSize == null) {
 			paginaSize = "10";
@@ -139,7 +168,13 @@ public class UsuarioController extends Controller {
 	 * Se deben pasar los atributos del usuario en el body de la petición. 
 	 * 
 	 */
+	@ApiOperation(nickname = "createUser",value = "crear usuario",notes = "crea un usuario", httpMethod = "POST")
+	@ApiImplicitParams({
+		@ApiImplicitParam(required = true, dataType = "models.UsuarioModel", paramType ="body"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
 	public Result createUser() {
+		ControllerHelper.headers(response());
 		Form<UsuarioModel> form = Form.form(UsuarioModel.class).bindFromRequest();
 		if (form.hasErrors()) {
 			return badRequest(ControllerHelper.errorJson(2, "invalid_user", form.errorsAsJson()));
@@ -161,8 +196,14 @@ public class UsuarioController extends Controller {
 	 * agregar emails nuevos, modificar pass,telefono y edad
 	 * 
 	 */
+	@ApiOperation(nickname = "update",value = "actualiza usuario",notes = "actualiza el usuario logeado", httpMethod = "PUT")
+	@ApiImplicitParams({
+		@ApiImplicitParam(required = true, dataType = "models.UsuarioModel", paramType ="body"),
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
 	@Security.Authenticated(secured.class)
 	public Result update() {
+		ControllerHelper.headers(response());
 		UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
 			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
@@ -203,8 +244,13 @@ public class UsuarioController extends Controller {
 	 * Action method para DELETE /user
 	 * 
 	 */
+	@ApiOperation(nickname = "delete",value = "borra usuario",notes = "borra el usuario logeado", httpMethod = "DELETE")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
+	})
 	@Security.Authenticated(secured.class)
 	public Result delete(){
+		ControllerHelper.headers(response());
 		UsuarioModel usuario=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 		if (usuario == null) {
 			String UserNoLogeado=Messages.get("UserNoLogeado",usuario);
@@ -215,9 +261,11 @@ public class UsuarioController extends Controller {
 		String correcto=Messages.get("BorradoCorrecta");
 		if (listaTareas!=null){
 			List<TareaModel> tareasEliminar=new ArrayList<TareaModel>();
+			List<String> tareasEliminarTexto=new ArrayList<String>();
 			for (TareaModel t:listaTareas){
 				if (t.usuarios.size()==1){
 					tareasEliminar.add(t);
+					tareasEliminarTexto.add(t.titulo);
 				}else{
 					t.usuarios.remove(usuario);
 				}
@@ -227,13 +275,10 @@ public class UsuarioController extends Controller {
 				tEliminar.delete();
 			}
 			
-			return ok(correcto +" junto con las siguientes tareas " + tareasEliminar);
+			return ok(correcto +" junto con las siguientes tareas " + tareasEliminarTexto);
 		}else{
 			usuario.delete();
 		}
-		
-		
-		
 		return ok(correcto);
 	}
 }

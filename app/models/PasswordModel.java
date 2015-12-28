@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Entity
 public class PasswordModel extends Model {
 	@Id
+	@JsonIgnore
 	public Long id;
 	@passwordInter
 	public String contrasenia = "";

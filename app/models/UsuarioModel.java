@@ -24,6 +24,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 @Entity
 public class UsuarioModel  extends Model{
 	@Id
+	@JsonIgnore
 	public Long id;
 	@Required
 	public String username;
@@ -158,7 +159,6 @@ public class UsuarioModel  extends Model{
 	public void generarToken(){
 		SecureRandom s= new SecureRandom();
 		String tok=new BigInteger(130,s).toString(32);
-		System.out.print(tok);
 		this.TOKEN=tok;
 		if (find.where().eq("TOKEN", tok).findList().size()==0){
 			UsuarioModel uu= UsuarioModel.findByUsername(this.username);

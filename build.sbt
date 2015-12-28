@@ -11,6 +11,7 @@ libraryDependencies ++= Seq(
   cache,
   "mysql" % "mysql-connector-java" % "5.1.36",
   "postgresql" % "postgresql" % "9.1-901-1.jdbc4",
+  "io.swagger" %% "swagger-play2" % "1.5.0",
   javaWs
 )
 

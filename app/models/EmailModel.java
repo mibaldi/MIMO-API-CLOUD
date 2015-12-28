@@ -8,9 +8,11 @@ import validators.EmailValidator;
 
 import com.avaje.ebean.Model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class EmailModel extends Model{
 	@Id
+	@JsonIgnore
 	public Long id;
 	public Long getId() {
 		return id;

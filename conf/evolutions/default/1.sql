@@ -27,7 +27,7 @@ create table tarea_model (
   titulo                        varchar(255),
   descripcion                   varchar(255),
   fechacreacion                 datetime,
-  fechafin                      datetime(6),
+  fechafin                      datetime,
   constraint pk_tarea_model primary key (id)
 );
 
