@@ -33,6 +33,11 @@ public class TareaController extends Controller {
 	 * @param titulo de tarea a recuperar.
 	 */
     @ApiOperation(nickname = "getTarea",value = "get tarea",notes = "muestra la tarea del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN",response=models.TareaModel.class, httpMethod = "GET")
+    @ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid format"),
+	     @ApiResponse(code = 200, message = "Tarea"),
+	     @ApiResponse(code = 401, message = "No existe la tarea para el usuario logeado"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
 		@ApiImplicitParam(name="users",value="username de los usuarios",required = true, dataType = "array", paramType ="query"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
@@ -65,6 +70,10 @@ public class TareaController extends Controller {
 	 * Action method para GET /tareas
 	 */
     @ApiOperation(nickname = "listaTareasUsuarios",value = "get lista tareas usuarios",notes = "muestra la lista de tareas de usuarios, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "GET")
+    @ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid format"),
+	     @ApiResponse(code = 200, message = "Lista Tareas"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
 		@ApiImplicitParam(name="users",value="username de los usuarios",required = true, dataType = "array", paramType ="query"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
@@ -95,9 +104,13 @@ public class TareaController extends Controller {
     }
     /**
 	 * Action method para GET /tareasTag
-	 * @param tag nombre del tag dentro de las tareas.
+	 * @param tags nombre del tag dentro de las tareas.
 	 */
     @ApiOperation(nickname = "listaTareasTag",value = "get lista tareas tag",notes = "muestra la lista de tareas con los tags buscados, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "GET")
+    @ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid format"),
+	     @ApiResponse(code = 200, message = "Lista Tareas por tag"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
 		@ApiImplicitParam(name="tags",value="tags",required = true, dataType = "array", paramType ="query"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
@@ -133,7 +146,11 @@ public class TareaController extends Controller {
 	 * 
 	 */
     @ApiOperation(nickname = "createTarea",value = "crear tarea",notes = "crea una tarea y la asocia al usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
-	@ApiImplicitParams({
+    @ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid tarea"),
+	     @ApiResponse(code = 200, message = "Creacion correcta"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
+    @ApiImplicitParams({
 		@ApiImplicitParam(required = true, dataType = "helpers.TareaJSONswagger", paramType ="body"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
@@ -162,7 +179,13 @@ public class TareaController extends Controller {
 	 * @param nombre titulo de la tarea a modificar.
 	 */
     @ApiOperation(nickname = "update",value = "modificar tarea",notes = "modifica una tarea existente del usuario, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
-	@ApiImplicitParams({
+    @ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid tarea"),
+	     @ApiResponse(code = 200, message = "Modificacion realizada"),
+	     @ApiResponse(code = 401, message = "No existe la tarea para el usuario logeado"),
+	     @ApiResponse(code = 304, message = "Sin modificaciones"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
+    @ApiImplicitParams({
 		@ApiImplicitParam(required = true, dataType = "helpers.TareaJSONswagger", paramType ="body"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
@@ -177,7 +200,7 @@ public class TareaController extends Controller {
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
     	if (tarea==null){
-    		return notFound();
+    		return unauthorized("no existe la tarea para el usuario logeado");
     	}
     	
 		Form<TareaModel> form = Form.form(TareaModel.class).bindFromRequest();
@@ -200,6 +223,11 @@ public class TareaController extends Controller {
 	 * @param texto= nombre tarea a modificar, nombreUsuario= username del usuario a agregar a la tarea
 	 */
     @ApiOperation(nickname = "añadirUsuario",value = "añade usuario a tarea",notes = "Añade un usuario a una tarea existente del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+    @ApiResponses({
+	     @ApiResponse(code = 200, message = "Usuario añadido"),
+	     @ApiResponse(code = 401, message = "No existe la tarea para el usuario logeado"),
+	     @ApiResponse(code = 404, message = "Usuario no encontrado"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
@@ -219,7 +247,7 @@ public class TareaController extends Controller {
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
 		if (tarea == null) {
-			return notFound("Tarea no valida");
+			return unauthorized("no existe la tarea para el usuario logeado");
 		}
 		tarea.añadirUsuario(uu);
 		return ok("usuario añadido");
@@ -230,6 +258,10 @@ public class TareaController extends Controller {
 	 * @param texto= nombre tarea a modificar, tag= tag del tag a agregar a la tarea
 	 */
     @ApiOperation(nickname = "añadirTag",value = "añade tag a tarea",notes = "Añade un tag a una tarea existente del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+    @ApiResponses({
+	     @ApiResponse(code = 200, message = "Tag añadido"),
+	     @ApiResponse(code = 401, message = "No existe la tarea para el usuario logeado"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
@@ -248,7 +280,7 @@ public class TareaController extends Controller {
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tarea=u.tareaExistente(texto);
 		if (tarea == null) {
-			return notFound("Tarea no valida");
+			return unauthorized("no existe la tarea para el usuario logeado");
 		}
 		t.añadirTarea(tarea);	
 		return ok("tag añadido");
@@ -261,6 +293,10 @@ public class TareaController extends Controller {
 	 * @param titulo de la tarea
 	 */
     @ApiOperation(nickname = "borrarTarea",value = "borrar tarea",notes = "borra la tarea del usuario logeado, Se necesita estar logeado mediante el token en la cabecera X-AUTH-TOKEN", httpMethod = "POST")
+    @ApiResponses({
+	     @ApiResponse(code = 200, message = "Usuario añadido"),
+	     @ApiResponse(code = 401, message = "No existe la tarea para el usuario logeado"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})

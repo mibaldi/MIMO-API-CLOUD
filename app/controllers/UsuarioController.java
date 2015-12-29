@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import play.i18n.Messages;
 
@@ -38,6 +39,10 @@ public class UsuarioController extends Controller {
 	 * 
 	 */
 	@ApiOperation(nickname = "login",value = "logearse",notes = "Returns a token", httpMethod = "POST")
+	@ApiResponses({
+		     @ApiResponse(code = 400, message = "Invalid format"),
+		     @ApiResponse(code = 200, message = "TOKEN"),
+		     @ApiResponse(code = 404, message = "Usuario o password incorrecto")})
 	@ApiImplicitParams({
 		@ApiImplicitParam(required = true, dataType = "helpers.UsuarioJSON", paramType ="body")
 	})
@@ -73,6 +78,8 @@ public class UsuarioController extends Controller {
 	 * 
 	 */
 	@ApiOperation(nickname = "logout",value = "desconectarse",notes = "Borra el token del usuario", httpMethod = "GET")
+	@ApiResponses({
+	     @ApiResponse(code = 200, message = "Desconectado")})
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
@@ -90,6 +97,10 @@ public class UsuarioController extends Controller {
 	 * 
 	 */
 	@ApiOperation(nickname = "getUser",value = "get usuario",notes = "muestra el usuario logeado",response=models.UsuarioModel.class, httpMethod = "GET")
+	@ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid format"),
+	     @ApiResponse(code = 200, message = "Usuario"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado ")})
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
@@ -128,7 +139,10 @@ public class UsuarioController extends Controller {
 	 * @param pag número de página a recuperar.
 	 */
 	@ApiOperation(nickname = "listaUsuarios",value = "get lista usuario",notes = "muestra la lista usuarios", httpMethod = "GET")
-	 @ApiImplicitParams({
+	@ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid format"),
+	     @ApiResponse(code = 200, message = "Lista Usuarios")}) 
+	@ApiImplicitParams({
 			@ApiImplicitParam(name="nombre",value="nombre de los usuarios",required = true, dataType = "string", paramType ="query"),
 			@ApiImplicitParam(name="edad",value="edad de los usuarios",required = true, dataType = "string", paramType ="query")
 		})
@@ -169,6 +183,9 @@ public class UsuarioController extends Controller {
 	 * 
 	 */
 	@ApiOperation(nickname = "createUser",value = "crear usuario",notes = "crea un usuario", httpMethod = "POST")
+	@ApiResponses({
+	     @ApiResponse(code = 200, message = "Creacion correcta"),
+	     @ApiResponse(code = 409, message = "Usuario ya existente")})
 	@ApiImplicitParams({
 		@ApiImplicitParam(required = true, dataType = "models.UsuarioModel", paramType ="body"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
@@ -197,6 +214,11 @@ public class UsuarioController extends Controller {
 	 * 
 	 */
 	@ApiOperation(nickname = "update",value = "actualiza usuario",notes = "actualiza el usuario logeado", httpMethod = "PUT")
+	@ApiResponses({
+	     @ApiResponse(code = 400, message = "Invalid format"),
+	     @ApiResponse(code = 200, message = "Modificacion realizada"),
+	     @ApiResponse(code = 304, message = "Sin modificaciones"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
 	@ApiImplicitParams({
 		@ApiImplicitParam(required = true, dataType = "models.UsuarioModel", paramType ="body"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
@@ -245,6 +267,9 @@ public class UsuarioController extends Controller {
 	 * 
 	 */
 	@ApiOperation(nickname = "delete",value = "borra usuario",notes = "borra el usuario logeado", httpMethod = "DELETE")
+	@ApiResponses({
+	     @ApiResponse(code = 200, message = "Borrado realizado"),
+	     @ApiResponse(code = 404, message = "Usuario no logeado")})
 	@ApiImplicitParams({
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})
