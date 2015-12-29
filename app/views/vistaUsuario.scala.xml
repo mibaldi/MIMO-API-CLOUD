@@ -9,6 +9,9 @@
 	<edad>
 		@u.edad
 	</edad>
+	<telefono>
+		@u.telefono
+	</telefono>
 	<tareas>
 		@for(t <- u.tareasUsuario){<tarea>@t.titulo</tarea>}
 	</tareas>
