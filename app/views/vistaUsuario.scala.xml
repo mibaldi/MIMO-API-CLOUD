@@ -9,9 +9,6 @@
 	<edad>
 		@u.edad
 	</edad>
-	<password>
-		@u.pass.getContrasenia
-	</password>
 	<tareas>
 		@for(t <- u.tareasUsuario){<tarea>@t.titulo</tarea>}
 	</tareas>
