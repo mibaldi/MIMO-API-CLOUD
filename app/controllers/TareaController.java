@@ -39,7 +39,6 @@ public class TareaController extends Controller {
 	     @ApiResponse(code = 401, message = "No existe la tarea para el usuario logeado"),
 	     @ApiResponse(code = 404, message = "Usuario no logeado")})
     @ApiImplicitParams({
-		@ApiImplicitParam(name="users",value="username de los usuarios",required = true, dataType = "array", paramType ="query"),
 		@ApiImplicitParam(name="X-AUTH-TOKEN",value="token de logeo",required = true, dataType = "string", paramType ="header")
 	})@Security.Authenticated(secured.class)
     public Result getTarea(@ApiParam(value = "titulo de la tarea") String texto){
