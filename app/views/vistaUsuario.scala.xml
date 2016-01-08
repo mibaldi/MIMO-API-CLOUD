@@ -12,10 +12,11 @@
 	<telefono>
 		@u.telefono
 	</telefono>
-	<tareas>
-		@for(t <- u.tareasUsuario){<tarea>@t.titulo</tarea>}
-	</tareas>
+	@vistaPass(u.getPass)
 	<emails>
 		@for(e <- u.emails){<email>@e.email</email>}
 	</emails>
+	<tareas>
+		@for(t <- u.tareasUsuario){@vistaTarea(t)}
+	</tareas>
 </usuario>

@@ -7,16 +7,14 @@
 	<descripcion>
 		@t.descripcion
 	</descripcion>
-	@if(!t.usuarios.isEmpty){
+	<fechacreacion>@t.fechacreacion</fechacreacion>
+	<fechafin>@t.fechafin</fechafin>
 	<usuarios>
 	@for(u <- t.usuarios){
 		<usuario>@u.getUsername</usuario>}
 	</usuarios>
-	}
-	@if(!t.tagsTarea.isEmpty){
 	<tags>
 	@for(tg <- t.tagsTarea){
 		<tag>@tg.tag</tag>}
 	</tags>
-	}
 </tarea>

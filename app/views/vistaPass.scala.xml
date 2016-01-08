@@ -1,0 +1,5 @@
+@(p:PasswordModel)
+<pass>
+<id>@p.id</id>
+<contrasenia>@p.getContrasenia</contrasenia>
+</pass>

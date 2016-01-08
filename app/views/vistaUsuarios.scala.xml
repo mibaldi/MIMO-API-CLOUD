@@ -2,5 +2,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <usuarios>
+<lista>
+@for(u <- listaU){@vistaUsuario(u)}
+</lista>
 <count>@count</count>
-@for(u <- listaU){@vistaUsuario(u)}</usuarios>
+</usuarios>

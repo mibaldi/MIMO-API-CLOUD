@@ -13,8 +13,8 @@ import com.avaje.ebean.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 @Entity
 public class PasswordModel extends Model {
-	@Id
 	@JsonIgnore
+	@Id
 	public Long id;
 	@passwordInter
 	public String contrasenia = "";

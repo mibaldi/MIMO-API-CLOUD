@@ -1,6 +1,7 @@
 package helpers;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,8 @@ public class TareaJSON{
 		public Long id;
 		public String titulo;
 		public String descripcion;
+		public Date fechacreacion;
+		public Date fechafin;
 		public List<String> Usuarios = new ArrayList<String>();
 		public List<String> Tags = new ArrayList<String>();
 		
@@ -21,6 +24,8 @@ public class TareaJSON{
 			this.id=t.id;
 			this.titulo=t.getTitulo();
 			this.descripcion=t.getDescripcion();
+			this.fechacreacion=t.fechacreacion;
+			this.fechafin=t.fechafin;
 			rellenarUsuarios(t.usuarios);
 			rellenarTags(t.tagsTarea);
 		}

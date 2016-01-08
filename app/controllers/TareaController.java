@@ -51,12 +51,12 @@ public class TareaController extends Controller {
     	texto=texto.replaceAll("%20", " ");
     	TareaModel tt=u.tareaExistente(texto);
     	if (tt!=null){
-    		if (request().accepts("application/xml")) {
-    			return ok(views.xml.vistaTarea.render(tt));
-    		}else if (request().accepts("application/json")) {
-    			
+    		if (request().accepts("application/json")) {
     			TareaJSON result =new TareaJSON(tt);
     			return ok(Json.toJson(result));
+    		}
+    		else if (request().accepts("application/xml")) {
+    			return ok(views.xml.vistaTarea.render(tt));
     		}
     		else {
     			String format=Messages.get("Formato");
@@ -91,12 +91,17 @@ public class TareaController extends Controller {
 			listaUsuarios=UsuarioModel.listaUserExistentes(usuarios, usuario);
 		}
 		Integer count = TareaModel.numeroTareas(usuario);
-    	if (request().accepts("application/xml")) {
-			return ok(views.xml.vistaTareas.render(TareaModel.findByUsuario(listaUsuarios, usuario),count));
-		} else if (request().accepts("application/json")) {
-			JsonNode jn = play.libs.Json.toJson(TareaJSON.convertir(TareaModel.findByUsuario(listaUsuarios,usuario)));
+		if (request().accepts("application/json")) {
+			List<TareaJSON>lu=TareaJSON.convertir(TareaModel.findByUsuario(listaUsuarios,usuario));
+			Map<String, Object> result = new HashMap<String, Object>();
+			result.put("numeroTareasUsuario", count);
+			result.put("lista", lu);
+			JsonNode jn = play.libs.Json.toJson(result);
 			return ok(jn);
-		} else {
+		}
+		else if (request().accepts("application/xml")) {
+			return ok(views.xml.vistaTareas.render(TareaModel.findByUsuario(listaUsuarios, usuario),count));
+		}  else {
 			String format=Messages.get("Formato");
 			return badRequest(format);
 		}
@@ -128,12 +133,13 @@ public class TareaController extends Controller {
 			listaTags=TagsModel.listaTagsExistentes(tags);
 		}
 		Integer count = TareaModel.numeroTareas(usuario);
-    	if (request().accepts("application/xml")) {
-			return ok(views.xml.vistaTareas.render(TareaModel.findByTag(listaTags,usuario),count));
-		} else if (request().accepts("application/json")) {
+		if (request().accepts("application/json")) {
 			JsonNode jn = play.libs.Json.toJson(TareaJSON.convertir(TareaModel.findByTag(listaTags,usuario)));
 			return ok(jn);
-		} else {
+		}
+		else if (request().accepts("application/xml")) {
+			return ok(views.xml.vistaTareas.render(TareaModel.findByTag(listaTags,usuario),count));
+		}  else {
 			String format=Messages.get("Formato");
 			return badRequest(format);
 		}

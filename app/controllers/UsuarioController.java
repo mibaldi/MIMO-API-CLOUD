@@ -56,13 +56,14 @@ public class UsuarioController extends Controller {
 		UsuarioModel uu = form.get();
 		if (UsuarioModel.auth(uu.username, uu.getPass())){
 			uu.generarToken();
-			if (request().accepts("application/xml")) {
-				return ok(views.xml.vistaToken.render(uu));
-			} else if (request().accepts("application/json")) {
+			if (request().accepts("application/json")) {
 				ObjectNode jn = play.libs.Json.newObject();
 				jn.put("TOKEN", uu.TOKEN);
 				
 				return ok(jn);
+			} 
+			else if (request().accepts("application/xml")) {
+				return ok(views.xml.vistaToken.render(uu));
 			} else {
 				String format=Messages.get("Formato");
 				return badRequest(format);
@@ -109,13 +110,15 @@ public class UsuarioController extends Controller {
 			ControllerHelper.headers(response());
 			UsuarioModel u=	(UsuarioModel) Http.Context.current().args.get("usuario_logado");
 			if(u !=null){
-			if (request().accepts("application/xml")) {
+				if (request().accepts("application/json")) {
+					
+					JsonNode jn = play.libs.Json.toJson(u);
+					return ok(jn);
+				}
+				else if (request().accepts("application/xml")) {
 				return ok(views.xml.vistaUsuario.render(u));
-			} else if (request().accepts("application/json")) {
-				
-				JsonNode jn = play.libs.Json.toJson(u);
-				return ok(jn);
-			} else {
+				}
+				else {
 				String format=Messages.get("Formato");
 				return badRequest(format);
 			}
@@ -164,15 +167,15 @@ public class UsuarioController extends Controller {
 				Integer count = UsuarioModel.find.findRowCount();
 				Integer size= Integer.valueOf(paginaSize);
 				List<UsuarioModel> lu=UsuarioModel.findBy(map,pag,size);
-				
-				if (request().accepts("application/xml")) {
-					return ok(views.xml.vistaUsuarios.render(lu,count));
-				} else if (request().accepts("application/json")) {
+				if (request().accepts("application/json")) {
 					Map<String, Object> result = new HashMap<String, Object>();
 					result.put("count", count);
 					result.put("lista", lu);
 					return ok(Json.toJson(result));
-				} else {
+				}
+				else if (request().accepts("application/xml")) {
+					return ok(views.xml.vistaUsuarios.render(lu,count));
+				}   else {
 					String format=Messages.get("Formato");
 					return badRequest(format);
 				}
